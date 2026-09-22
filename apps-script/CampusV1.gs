@@ -26,16 +26,19 @@ function testerChaineCampus(){
     console.log('RECETTE OK — apprenant fictif, deux tentatives 50 % / 100 %, résultat retenu 100 %, progression et compétence validées.');
   }finally{lock.releaseLock();}
 }
-var CAMPUS_VERSION='1.1.0';
+var CAMPUS_VERSION='1.2.0';
+function verifierParcours(){var data=learning_();console.log('Parcours OK : '+data.RESSOURCES.length+' ressources, '+catalog_().SEANCES_ACTIVITES.length+' liaisons de séance.');}
 function doGet(){return json_({ok:true,service:'Campus LTS API',version:CAMPUS_VERSION});}
 function doPost(e){try{
   var p=JSON.parse(e.postData.contents);auth_(p.pin);
   if(p.action==='catalog')return json_({ok:true,data:catalog_()});
+  if(p.action==='learning')return json_({ok:true,data:learning_()});
   if(p.action==='tracking')return json_({ok:true,data:tracking_()});
   if(p.action==='quiz')return json_({ok:true,data:quiz_(Number(p.quizId))});
   var lock=LockService.getScriptLock();lock.waitLock(30000);
   try{
     if(p.action==='createQuiz')return json_({ok:true,data:createQuiz_(p)});
+    if(p.action==='createActivity')return json_({ok:true,data:createActivity_(p)});
     if(p.action==='submitAttempt')return json_({ok:true,data:submitAttempt_(p)});
     throw Error('ACTION_INCONNUE');
   }finally{lock.releaseLock();}
@@ -60,6 +63,20 @@ function int_(n,min,max){if(!Number.isInteger(n)||n<min||n>max)throw Error('VALE
 function txt_(s,max){if(typeof s!=='string'||!s.trim()||s.length>max)throw Error('TEXTE_INVALIDE');return s.trim();}
 function token_(s){if(typeof s!=='string'||!/^[a-zA-Z0-9-]{16,80}$/.test(s))throw Error('IDENTIFIANT_REQUIS');return 'CAMPUS_'+s;}
 function catalog_(){var out={};['PARCOURS','MODULES','SEQUENCES','SEANCES','ACTIVITES','COMPETENCES','GROUPES','PARCOURS_MODULES','MODULES_SEQUENCES','SEQUENCES_SEANCES','SEANCES_ACTIVITES'].forEach(function(t){out[t]=rows_(t).filter(active_);});out.QUIZ=rows_('QUIZ');out.EVALUATIONS=rows_('EVALUATIONS');return out;}
+function learning_(){var out={};['RESSOURCES','ACTIVITES_RESSOURCES','ACTIVITES_EVALUATIONS','ACTIVITES_COMPETENCES'].forEach(function(t){out[t]=rows_(t).filter(active_);});return out;}
+function createActivity_(p){
+  var key=token_(p.requestId),old=rows_('ACTIVITES').find(function(a){return a.ID_ACTIVITE===key;});if(old)return {activityId:old.id,replayed:true};
+  var a=p.activity||{},session=one_(rows_('SEANCES'),Number(a.sessionId));if(!active_(session))throw Error('REFERENCE_INACTIVE');
+  var title=txt_(a.title,200),content=txt_(a.content,30000);int_(a.minutes,1,600);
+  if(['Cours','Exercice','Travail à rendre','TP'].indexOf(a.type)<0)throw Error('TYPE_ACTIVITE_INVALIDE');
+  var resources=a.resources||[];if(!Array.isArray(resources)||resources.length>10)throw Error('RESSOURCES_INVALIDES');
+  resources.forEach(function(r){txt_(r.title,200);if(typeof r.url!=='string'||r.url.length>2000||!/^https:\/\/[^\s/@]+[^\s]*$/i.test(r.url)||/[<>"']/.test(r.url))throw Error('URL_INVALIDE');});
+  var links=rows_('SEANCES_ACTIVITES').filter(function(l){return l.SEANCE===session.id;});
+  var b=batch_(),id=b.add('ACTIVITES',{ID_ACTIVITE:key,TITRE:title,DESCRIPTION:content,TYPE:a.type,DUREE_PREVUE:a.minutes,MODALITE:'Individuel',ACTIF:true});
+  b.add('SEANCES_ACTIVITES',{ID_LIAISON:uid_('SA'),SEANCE:session.id,ACTIVITE:id,ORDRE:links.reduce(function(n,l){return Math.max(n,Number(l.ORDRE)||0);},0)+1,OBLIGATOIRE:true,ACTIF:true});
+  resources.forEach(function(r,i){var resource=b.add('RESSOURCES',{ID_RESSOURCE:uid_('R'),TITRE:r.title.trim(),TYPE:'Lien',URL:r.url.trim(),ACTIF:true});b.add('ACTIVITES_RESSOURCES',{ID_LIAISON:uid_('AR'),ACTIVITE:id,RESSOURCE:resource,ORDRE:i+1,OBLIGATOIRE:false,ACTIF:true});});
+  b.save();return {activityId:id,sessionId:session.id};
+}
 function tracking_(){return {users:rows_('UTILISATEURS').filter(active_).map(function(u){return {id:u.id,name:u.NOM_COMPLET||u.NOM+' '+u.PRENOM};}),inscriptions:rows_('INSCRIPTIONS').filter(active_),groups:rows_('GROUPES').filter(active_),results:rows_('RESULTATS').filter(active_),attempts:rows_('TENTATIVES').filter(active_),progress:rows_('PROGRESSION'),validations:rows_('VALIDATIONS_COMPETENCES').filter(active_),evaluations:rows_('EVALUATIONS'),quizzes:rows_('QUIZ')};}
 function quiz_(id){var q=one_(rows_('QUIZ'),id),ev=one_(rows_('EVALUATIONS'),q.EVALUATION),qs=rows_('QUESTIONS'),os=rows_('OPTIONS_QUESTION');
   return {id:id,evaluation:ev,questions:rows_('QUIZ_QUESTIONS').filter(function(l){return l.QUIZ===id&&active_(l);}).sort(function(a,b){return a.ORDRE-b.ORDRE;}).map(function(l){var x=one_(qs,l.QUESTION);return {id:x.id,title:x.ENONCE,points:l.POINTS,options:os.filter(function(o){return o.QUESTION===x.id&&active_(o);}).sort(function(a,b){return a.ORDRE-b.ORDRE;}).map(function(o){return {id:o.id,title:o.TEXTE_OPTION};})};})};}

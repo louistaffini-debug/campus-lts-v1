@@ -31,5 +31,14 @@ for(const a of applied.flat())if(a[1]==='RESULTATS')assert(!('POURCENTAGE'in a[3
 db=structuredClone(initial);applied=[];post(payload);
 r=post({...attempt,answers:[{questionId:1,optionId:1},{questionId:1,optionId:1}]});assert.equal(r.error,'REPONSE_DUPLIQUEE');assert.equal(db.TENTATIVES.length,0);
 r=post({...attempt,answers:[{questionId:1,optionId:4},{questionId:2,optionId:4}]});assert.equal(r.error,'OPTION_INVALIDE');assert.equal(db.TENTATIVES.length,0);
+db.SEANCES=[{id:1,ACTIF:true}];db.SEANCES_ACTIVITES=[];db.RESSOURCES=[];db.ACTIVITES_RESSOURCES=[];
+const course={pin:'test-secret',action:'createActivity',requestId:'test-course-000001',activity:{sessionId:1,title:'Cours test',content:'Contenu du cours',type:'Cours',minutes:30,resources:[{title:'Document',url:'https://example.com/course'}]}};
+assert.equal(post({...course,pin:''}).error,'ACCES_REFUSE');
+assert.equal(post({...course,activity:{...course.activity,resources:[{title:'X',url:'javascript:alert(1)'}]}}).error,'URL_INVALIDE');
+assert.equal(post(course).ok,true);assert.equal(db.SEANCES_ACTIVITES.length,1);assert.equal(db.RESSOURCES.length,1);
+assert.equal(post(course).data.replayed,true);assert.equal(db.SEANCES_ACTIVITES.length,1);
+assert.equal(post({pin:'test-secret',action:'learning'}).data.RESSOURCES.length,1);
+assert.equal(post({...course,requestId:'test-course-000002',activity:{...course.activity,sessionId:999}}).error,'REFERENCE_INVALIDE');
+console.log('OK — course creation, linked resources, authentication, URL validation and idempotency.');
 for(let i=0;i<20;i++)post({pin:'wrong',action:'catalog'});assert.equal(post({pin:'wrong',action:'catalog'}).error,'PATIENTEZ_10_MINUTES');
 console.log('OK — authentication, grading, references, two attempts, idempotency, progression, competencies and attempt limit.');
