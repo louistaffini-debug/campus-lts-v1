@@ -1,5 +1,13 @@
 # Campus LTS V1
 
+## Version actuelle : GitHub Pages + Google Apps Script + Grist
+
+L'application à publier est dans **`site/`** (HTML/CSS/JavaScript sans dépendances). Le serveur correspondant est **`apps-script/CampusV1.gs`**, à installer comme unique contenu de Code.gs dans Google Apps Script.
+
+Lancer `node scripts/serve-campus.mjs` pour l'aperçu et `node scripts/test-campus.mjs` pour les tests. Lire **[le guide complet](docs/DEPLOIEMENT-V1.md)** pour l'installation, les propriétés secrètes, la publication et la recette.
+
+Le dossier `app/` ci-dessous et les anciennes instructions OpenAI Sites sont l'historique de la première maquette, pas la cible de publication actuelle.
+
 Application pédagogique reliée à Grist avec création de quiz et suivi apprenant.
 
 ## Installation
