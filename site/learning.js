@@ -85,9 +85,10 @@ function activityEditor(sessionId,learning) {
     });
   };
 }
-function demoLearning(){return {RESSOURCES:[{id:1,TITRE:'Exemple de support PDF',TYPE:'PDF',URL:'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf',ACTIF:true}],ACTIVITES_RESSOURCES:[{ACTIVITE:1,RESSOURCE:1,ORDRE:1,ACTIF:true}],ACTIVITES_EVALUATIONS:[]};}
+function demoLearning(){return {RESSOURCES:[{id:1,TITRE:'Exemple de support PDF',TYPE:'PDF',URL:'https://mozilla.github.io/pdf.js/web/viewer.html?file=compressed.tracemonkey-pldi-09.pdf',ACTIF:true}],ACTIVITES_RESSOURCES:[{ACTIVITE:1,RESSOURCE:1,ORDRE:1,ACTIF:true}],ACTIVITES_EVALUATIONS:[]};}
 // Add the new entry without changing existing quiz navigation or saved data.
 const pathwaysButton=document.createElement('button');
 pathwaysButton.dataset.view='pathways';pathwaysButton.textContent='◫   Mes parcours';
 document.querySelector('nav').insertBefore(pathwaysButton,document.querySelector('[data-view="quiz"]'));
 pathwaysButton.onclick=()=>{view='pathways';notice();render();};
+
