@@ -32,3 +32,14 @@ corrections, retours et progression hors quiz restent à réaliser.
 « Travail à rendre » contient uniquement les consignes : aucun dépôt simulé.
 Le modèle accepte tous les parcours présents dans Grist ; il ne crée pas
 automatiquement CPI, CPRP, BIP, ETSO et WorldSkills ni leurs contenus.
+
+## Lecteur de ressources — version 1.3
+
+Les PDF, images, vidéos MP4/WebM, vidéos YouTube ou Vimeo et fichiers Google
+Drive compatibles sont affichés directement dans la séance. Chaque ressource
+conserve un bouton d’ouverture externe. Le format peut être choisi lors de la
+création ou détecté automatiquement à partir de l’adresse HTTPS.
+
+Un hébergeur peut interdire l’intégration dans une autre page. Dans ce cas, le
+bouton d’ouverture externe reste disponible. Les droits Google Drive restent
+ceux du fichier source : Campus LTS ne rend jamais un document privé public.

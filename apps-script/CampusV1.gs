@@ -26,7 +26,7 @@ function testerChaineCampus(){
     console.log('RECETTE OK — apprenant fictif, deux tentatives 50 % / 100 %, résultat retenu 100 %, progression et compétence validées.');
   }finally{lock.releaseLock();}
 }
-var CAMPUS_VERSION='1.2.0';
+var CAMPUS_VERSION='1.3.0';
 function verifierParcours(){var data=learning_();console.log('Parcours OK : '+data.RESSOURCES.length+' ressources, '+catalog_().SEANCES_ACTIVITES.length+' liaisons de séance.');}
 function doGet(){return json_({ok:true,service:'Campus LTS API',version:CAMPUS_VERSION});}
 function doPost(e){try{
@@ -70,11 +70,11 @@ function createActivity_(p){
   var title=txt_(a.title,200),content=txt_(a.content,30000);int_(a.minutes,1,600);
   if(['Cours','Exercice','Travail à rendre','TP'].indexOf(a.type)<0)throw Error('TYPE_ACTIVITE_INVALIDE');
   var resources=a.resources||[];if(!Array.isArray(resources)||resources.length>10)throw Error('RESSOURCES_INVALIDES');
-  resources.forEach(function(r){txt_(r.title,200);if(typeof r.url!=='string'||r.url.length>2000||!/^https:\/\/[^\s/@]+[^\s]*$/i.test(r.url)||/[<>"']/.test(r.url))throw Error('URL_INVALIDE');});
+  resources.forEach(function(r){txt_(r.title,200);if(['Automatique','PDF','Vidéo','Image','Lien'].indexOf(r.type||'Automatique')<0)throw Error('TYPE_RESSOURCE_INVALIDE');if(typeof r.url!=='string'||r.url.length>2000||!/^https:\/\/[^\s/@]+[^\s]*$/i.test(r.url)||/[<>"']/.test(r.url))throw Error('URL_INVALIDE');});
   var links=rows_('SEANCES_ACTIVITES').filter(function(l){return l.SEANCE===session.id;});
   var b=batch_(),id=b.add('ACTIVITES',{ID_ACTIVITE:key,TITRE:title,DESCRIPTION:content,TYPE:a.type,DUREE_PREVUE:a.minutes,MODALITE:'Individuel',ACTIF:true});
   b.add('SEANCES_ACTIVITES',{ID_LIAISON:uid_('SA'),SEANCE:session.id,ACTIVITE:id,ORDRE:links.reduce(function(n,l){return Math.max(n,Number(l.ORDRE)||0);},0)+1,OBLIGATOIRE:true,ACTIF:true});
-  resources.forEach(function(r,i){var resource=b.add('RESSOURCES',{ID_RESSOURCE:uid_('R'),TITRE:r.title.trim(),TYPE:'Lien',URL:r.url.trim(),ACTIF:true});b.add('ACTIVITES_RESSOURCES',{ID_LIAISON:uid_('AR'),ACTIVITE:id,RESSOURCE:resource,ORDRE:i+1,OBLIGATOIRE:false,ACTIF:true});});
+  resources.forEach(function(r,i){var resource=b.add('RESSOURCES',{ID_RESSOURCE:uid_('R'),TITRE:r.title.trim(),TYPE:r.type||'Automatique',URL:r.url.trim(),ACTIF:true});b.add('ACTIVITES_RESSOURCES',{ID_LIAISON:uid_('AR'),ACTIVITE:id,RESSOURCE:resource,ORDRE:i+1,OBLIGATOIRE:false,ACTIF:true});});
   b.save();return {activityId:id,sessionId:session.id};
 }
 function tracking_(){return {users:rows_('UTILISATEURS').filter(active_).map(function(u){return {id:u.id,name:u.NOM_COMPLET||u.NOM+' '+u.PRENOM};}),inscriptions:rows_('INSCRIPTIONS').filter(active_),groups:rows_('GROUPES').filter(active_),results:rows_('RESULTATS').filter(active_),attempts:rows_('TENTATIVES').filter(active_),progress:rows_('PROGRESSION'),validations:rows_('VALIDATIONS_COMPETENCES').filter(active_),evaluations:rows_('EVALUATIONS'),quizzes:rows_('QUIZ')};}

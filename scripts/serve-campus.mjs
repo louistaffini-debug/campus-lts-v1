@@ -5,7 +5,7 @@ const types={html:'text/html; charset=utf-8',js:'text/javascript; charset=utf-8'
 http.createServer(async(req,res)=>{
   const path=new URL(req.url,'http://localhost').pathname;
   const file=path==='/'?'index.html':path.slice(1);
-  if(!['index.html','styles.css','atelier-theme.css','app.js','learning.js','config.js','api-source'].includes(file)){
+  if(!['index.html','styles.css','atelier-theme.css','resources.css','app.js','learning.js','config.js','api-source'].includes(file)){
     res.writeHead(404);res.end();return;
   }
   try{
