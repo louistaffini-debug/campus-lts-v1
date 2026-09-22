@@ -1,23 +1,20 @@
-# Campus LTS V1
+# Campus LTS — LMS maison
 
-## Version actuelle : GitHub Pages + Google Apps Script + Grist
+Site pédagogique publié sur GitHub Pages (`site/`), API Google Apps Script (`apps-script/CampusV1.gs` et `apps-script/CampusLms.gs`) et données Grist. La clé Grist et le code enseignant restent exclusivement dans les propriétés du script Google ; ils ne sont jamais inclus dans le site public.
 
-L'application à publier est dans **`site/`** (HTML/CSS/JavaScript sans dépendances). Le serveur correspondant est **`apps-script/CampusV1.gs`**, à installer comme unique contenu de Code.gs dans Google Apps Script.
+## Fonctions disponibles
 
-Lancer `node scripts/serve-campus.mjs` pour l'aperçu et `node scripts/test-campus.mjs` pour les tests. Lire **[le guide complet](docs/DEPLOIEMENT-V1.md)** pour l'installation, les propriétés secrètes, la publication et la recette.
+- Cinq parcours extensibles : CPI, CPRP, BIP, ETSO et WorldSkills. Une même ressource, séance ou activité peut servir dans plusieurs parcours.
+- Espace enseignant : organisation parcours → modules → séquences → séances, activités, ressources PDF/vidéo/liens, quiz, groupes et comptes apprenants pseudonymes, prérequis, correction des travaux, compétences et suivi.
+- Espace apprenant individuel : activation du compte, parcours et séances, lecture des ressources, quiz, progression personnelle et remise d'un travail par lien HTTPS.
+- Les tables de liaison Grist restent derrière l'interface. Les requêtes de l'espace apprenant sont filtrées côté serveur par inscription.
 
-Le dossier `app/` ci-dessous et les anciennes instructions OpenAI Sites sont l'historique de la première maquette, pas la cible de publication actuelle.
+## Démarrage et vérification
 
-Application pédagogique reliée à Grist avec création de quiz et suivi apprenant.
+`node scripts/serve-campus.mjs` sert l'aperçu local. `node scripts/test-campus.mjs` vérifie les flux métier et les contrôles d'accès. Le guide [Installation du LMS](docs/INSTALLATION-LMS.md) détaille l'installation réelle et la recette.
 
-## Installation
+Le dossier `app/` est l'historique d'une première maquette et n'est pas la cible de publication. La cible est `site/`.
 
-1. Installer Node.js 22+, puis lancer `npm ci`.
-2. Copier `.env.example` vers `.env.local` et renseigner Grist. Sans ces valeurs, l'application reste en démonstration.
-3. Lancer `npm run dev` et ouvrir l'adresse affichée.
+## Périmètre de cette version
 
-## Sécurité et déploiement
-
-La clé Grist reste côté serveur : ne jamais la préfixer par `NEXT_PUBLIC_` ni la commiter. Les routes d'écriture exigent un utilisateur ChatGPT authentifié sur OpenAI Sites. Configurer les trois variables Grist dans l'environnement du Site avant publication.
-
-Voir `docs/GRIST.md` et `docs/TESTS.md`.
+La remise de travaux utilise un lien HTTPS vers un fichier hébergé ailleurs ; le site ne stocke pas de fichier binaire. Le code enseignant est encore partagé, et les comptes apprenants sont pseudonymes. Avant d'accueillir de vrais élèves, faire valider l'hébergement des travaux, les accès, les durées de conservation et l'information des personnes par l'établissement et son DPD. Ce LMS n'est pas une copie intégrale de Moodle/Éléa.

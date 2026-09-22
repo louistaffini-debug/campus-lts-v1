@@ -1,4 +1,4 @@
-// Remplace entièrement Code.gs. Ne pas installer les deux fichiers ensemble.
+// Installer avec CampusLms.gs. Ne pas conserver le Code.gs historique en parallèle.
 // Contrôle propriétaire uniquement, jamais exposé par doPost.
 function verifierCampus(){
   var columns=req_('/tables/RESULTATS/columns').columns;
@@ -26,11 +26,14 @@ function testerChaineCampus(){
     console.log('RECETTE OK — apprenant fictif, deux tentatives 50 % / 100 %, résultat retenu 100 %, progression et compétence validées.');
   }finally{lock.releaseLock();}
 }
-var CAMPUS_VERSION='1.3.0';
+var CAMPUS_VERSION='2.0.0';
 function verifierParcours(){var data=learning_();console.log('Parcours OK : '+data.RESSOURCES.length+' ressources, '+catalog_().SEANCES_ACTIVITES.length+' liaisons de séance.');}
 function doGet(){return json_({ok:true,service:'Campus LTS API',version:CAMPUS_VERSION});}
 function doPost(e){try{
-  var p=JSON.parse(e.postData.contents);auth_(p.pin);
+  var p=JSON.parse(e.postData.contents);
+  if(/^student[A-Z]/.test(p.action||''))return json_({ok:true,data:lmsStudent_(p)});
+  auth_(p.pin);
+  if(/^lms[A-Z]/.test(p.action||''))return json_({ok:true,data:lmsTeacher_(p)});
   if(p.action==='catalog')return json_({ok:true,data:catalog_()});
   if(p.action==='learning')return json_({ok:true,data:learning_()});
   if(p.action==='tracking')return json_({ok:true,data:tracking_()});

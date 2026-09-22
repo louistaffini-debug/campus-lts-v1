@@ -1,0 +1,9 @@
+.activation { margin-top: 22px; }
+.activation summary, .panel details summary { cursor: pointer; padding: 12px 0; }
+.activation form { padding-top: 12px; }
+.panel form button { margin-top: 16px; }
+.panel h3 { margin: 12px 0; }
+.submission { border-top: 1px solid var(--line); padding: 18px 0; }
+.resource-list { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 20px; }
+.session-open { margin: 8px 8px 8px 0; }
+@media (max-width: 700px) { .panel form.grid { display: block; } .panel form.grid label { margin: 12px 0; } }

@@ -2,7 +2,7 @@ name: Campus LTS Pages
 on:
   push:
     branches: [main]
-    paths: ['site/**', 'apps-script/CampusV1.gs', 'scripts/test-campus.mjs', '.github/workflows/campus-pages.yml']
+    paths: ['site/**', 'apps-script/CampusV1.gs', 'apps-script/CampusLms.gs', 'scripts/test-campus.mjs', '.github/workflows/campus-pages.yml']
   workflow_dispatch:
 permissions:
   contents: read
@@ -35,4 +35,3 @@ jobs:
       - name: Déployer
         id: deployment
         uses: actions/deploy-pages@v4
-
