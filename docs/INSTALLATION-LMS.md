@@ -9,7 +9,7 @@ GitHub Pages affiche le site statique de `site/`. Il contacte l'application Web 
 1. Sauvegarder le document Grist et le projet Apps Script. Conserver les propriétés `GRIST_BASE_URL`, `GRIST_DOC_ID`, `GRIST_API_KEY` et `WRITE_PIN` ; ne pas les copier dans le dépôt.
 2. Dans le projet Apps Script, remplacer le code de l'API par `CampusV1.gs` suivi de `CampusLms.gs`, ou créer ces deux fichiers dans le même projet. L'ancien `Code.gs` historique ne doit pas être installé en parallèle.
 3. En tant que propriétaire, exécuter `installerLms()`. Vérifier dans le journal « 3 tables, 5 parcours et une séance d'accueil ». La fonction peut être relancée après une interruption.
-4. Mettre à jour **le déploiement Web existant**, en créant une nouvelle version. Conserver la même URL `/exec`, l'exécution en tant que propriétaire et les paramètres d'accès déjà choisis. Vérifier le JSON de santé : `ok: true`, `version: 2.0.0`, `grist: configured`.
+4. Mettre à jour **le déploiement Web existant**, en créant une nouvelle version. Conserver la même URL `/exec`, l'exécution en tant que propriétaire et les paramètres d'accès déjà choisis. Vérifier le JSON de santé : `ok: true`, `version: 2.0.0`. La disponibilité réelle de Grist est vérifiée par l'installation et les lectures authentifiées.
 5. Publier le dossier `site/` par le workflow GitHub Pages. Attendre la réussite du workflow avant de vérifier l'URL publique.
 
 ## Utilisation
@@ -31,3 +31,4 @@ Les travaux sont remis via **un lien HTTPS**. Vérifier que le service externe a
 ## Sécurité et mise en production pédagogique
 
 Le code enseignant est partagé : il convient à un pilote mais pas à une gestion fine des droits par enseignant. Les sessions apprenants expirent après six heures ; les codes d'activation après quatorze jours. Les mots de passe sont salés et dérivés côté serveur avec un secret non publié. Ne pas saisir de noms d'élèves dans cette version sans validation institutionnelle. Prévoir une revue DPD/RGPD, politique de conservation, procédure de suppression/export et choix d'un stockage de travaux approuvé avant usage réel en établissement. Les liens de remise externes nécessitent une politique de partage adaptée. Aucun module de visioconférence, carnet de notes institutionnel ou dépôt binaire natif n'est fourni.
+
