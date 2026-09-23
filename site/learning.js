@@ -29,7 +29,7 @@ function resourcePlayer(r) {
 }
 function pathways() {
   $('#content').innerHTML=title('APPRENDRE / PARCOURS','Mes parcours','Retrouvez les cours, les exercices et les évaluations de chaque séance.')+
-    '<p class="footnote">Espace enseignant · Les comptes apprenants et le dépôt privé des travaux ne sont pas encore ouverts.</p>'+
+    '<p class="footnote">Espace enseignant · Les apprenants voient uniquement leurs parcours et remettent leurs travaux par lien HTTPS dans leur espace personnel.</p>'+
     (catalog.PARCOURS.length ? catalog.PARCOURS.map(p => `<section class="panel"><h2>${esc(p.TITRE)}</h2>${courseText(p.DESCRIPTION)}${
       orderedChildren(catalog.PARCOURS_MODULES,'PARCOURS',p.id,'MODULE',catalog.MODULES).map(m =>
         `<details open><summary><strong>${esc(m.TITRE)}</strong></summary>${courseText(m.DESCRIPTION)}${
@@ -51,10 +51,10 @@ function sessionPage(id,learning) {
   const se=catalog.SEANCES.find(s=>s.id===id); if(!se)return;
   const activities=orderedChildren(catalog.SEANCES_ACTIVITES,'SEANCE',id,'ACTIVITE',catalog.ACTIVITES);
   $('#content').innerHTML=title('PARCOURS / SÉANCE',se.TITRE,se.DESCRIPTION || 'Cours et activités de la séance')+
-    '<div class="row"><button id="back-pathways" class="secondary">← Mes parcours</button><button id="new-activity" class="primary">Ajouter une activité</button></div><p class="footnote">La consultation des cours n’est pas encore comptabilisée dans la progression.</p>'+
+    '<div class="row"><button id="back-pathways" class="secondary">← Mes parcours</button><button id="new-activity" class="primary">Ajouter une activité</button></div><p class="footnote">Un cours compte dans la progression lorsque l’apprenant le marque comme terminé.</p>'+
     activities.map(a=>`<section class="panel"><span class="badge">${esc(a.TYPE || 'Activité')}</span><h2>${esc(a.TITRE)}</h2>${courseText(a.DESCRIPTION)}${
       orderedChildren(learning.ACTIVITES_RESSOURCES,'ACTIVITE',a.id,'RESSOURCE',learning.RESSOURCES).map(resourcePlayer).join('')}
-      ${a.TYPE==='Travail à rendre'?'<div class="callout">Consignes uniquement : le dépôt privé des fichiers sera disponible après la mise en place des comptes apprenants.</div>':''}
+      ${a.TYPE==='Travail à rendre'?'<div class="callout">L’apprenant remet un lien HTTPS dans son espace personnel. Vous corrigez ensuite le travail dans « Organiser le campus ».</div>':''}
       ${(learning.ACTIVITES_EVALUATIONS||[]).some(l=>l.ACTIVITE===a.id && catalog.QUIZ.some(q=>q.EVALUATION===l.EVALUATION))?'<button class="secondary" data-session-quiz>Accéder aux quiz</button>':''}</section>`).join('')+
     (!activities.length?'<section class="panel empty">Cette séance ne contient pas encore d’activité.</section>':'')+'<div id="activity-editor"></div>';
   $('#back-pathways').onclick=pathways;
@@ -91,4 +91,3 @@ const pathwaysButton=document.createElement('button');
 pathwaysButton.dataset.view='pathways';pathwaysButton.textContent='◫   Mes parcours';
 document.querySelector('nav').insertBefore(pathwaysButton,document.querySelector('[data-view="quiz"]'));
 pathwaysButton.onclick=()=>{view='pathways';notice();render();};
-
