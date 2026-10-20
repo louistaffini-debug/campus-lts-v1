@@ -3,11 +3,14 @@ on:
   push:
     branches: [main]
     paths: ['site/**', 'apps-script/CampusV1.gs', 'apps-script/CampusLms.gs', 'scripts/test-campus.mjs', '.github/workflows/campus-pages.yml']
+  pull_request:
+    branches: [main]
+    paths: ['site/**', 'apps-script/CampusV1.gs', 'apps-script/CampusLms.gs', 'scripts/test-campus.mjs', '.github/workflows/campus-pages.yml']
   workflow_dispatch:
 permissions:
   contents: read
 concurrency:
-  group: campus-pages
+  group: campus-pages-${{ github.ref }}
   cancel-in-progress: true
 jobs:
   build:
@@ -22,7 +25,7 @@ jobs:
         with:
           path: site
   deploy:
-    if: github.event.repository.private == false
+    if: github.event.repository.private == false && github.event_name != 'pull_request'
     needs: build
     runs-on: ubuntu-latest
     permissions:

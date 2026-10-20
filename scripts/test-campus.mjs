@@ -70,3 +70,17 @@ assert.equal(post({action:'studentSubmit',sessionToken,inscriptionId:studentIns,
 const grade=post({pin:'test-secret',action:'lmsGrade',submissionId:db.LTS_DEPOTS[0].id,score:85,comment:'Bon travail'});assert.equal(grade.ok,true);home=post({action:'studentHome',sessionToken});assert.equal(home.data.submissions[0].COMMENTAIRE,'Bon travail');assert.equal(home.data.progress.find(p=>p.ACTIVITE===workId).POURCENTAGE,100);
 assert.equal(post({action:'studentHome',sessionToken:'00000000-0000-0000-0000-000000000000'}).error,'SESSION_EXPIREE');
 console.log('OK — five pathways, authoring, individual activation, scoped learner access, progression, submission and grading.');
+
+
+for (const table of ['GROUPES','PARCOURS','MODULES','SEQUENCES','SEANCES']) {
+  const record=db[table].find(x=>x.id===1),wasActive=record.ACTIF;
+  record.ACTIF=false;
+  const denied=post({action:'studentComplete',sessionToken,inscriptionId:studentIns,activityId});
+  assert.equal(denied.error,'ACTIVITE_REFUSEE',table+' must block access');
+  const hidden=post({action:'studentHome',sessionToken});
+  assert.equal(hidden.ok,true,table+' home should load');
+  assert(!hidden.data.catalog.ACTIVITES.some(x=>x.id===activityId),table+' must hide linked activity');
+  record.ACTIF=wasActive;
+}
+assert.equal(post({action:'studentHome',sessionToken}).data.catalog.ACTIVITES.some(x=>x.id===activityId),true);
+console.log('OK — inactive group, pathway, module, sequence and session deny learner access.');
